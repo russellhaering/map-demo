@@ -10,7 +10,7 @@ public class FFTSignalDatabase {
 	static final int MAX_FREQ = 2200;
 
 	// Minimum amplitude to trigger a 'hit'
-	static final int MIN_AMP = 200000;
+	static final int MIN_AMP = 2000000;
 
 	// Maximum allowable change in frequency between two samples
 	// This is used to detect only relatively "smooth", continuous signals
@@ -69,7 +69,7 @@ public class FFTSignalDatabase {
 
 		if (currentCount >= DETECT_THRESHOLD) {
 			// Enough hits detected in a row, signal detected
-			frame = new MAPFrame(vals, new boolean[vals.length], curFreq);
+			frame = new MAPFrame(vals, new boolean[vals.length], freqToIndex(curFreq));
 
 			if (currentCount > MAX_COUNT) {
 				currentCount = MAX_COUNT;

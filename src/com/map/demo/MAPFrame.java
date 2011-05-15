@@ -3,7 +3,7 @@ package com.map.demo;
 import java.awt.Color;
 
 public class MAPFrame {
-	private static float MAXVAL = 500000;
+	private static float MAXVAL = 800000;
 	private final int[] vals;
 	private final boolean[] hits;
 	private final int level;
@@ -32,10 +32,16 @@ public class MAPFrame {
 		for (int i = offset; i < offset + count; i++) {
 			total += Math.abs(vals[offset]);
 		}
-		float percent = (total / count) / MAXVAL;
+		float percent = ((total - (MAXVAL / 4)) / count) / MAXVAL;
 		if (percent > 1) {
 			percent = 1;
 		}
+		if (percent < 0) {
+			percent = 0;
+		}
+
+		percent *= 0.7;
+
 		return new Color((1 - percent), (1 - percent), (1 - percent)).getRGB();
 	}
 }

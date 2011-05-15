@@ -20,6 +20,7 @@ public class DemoUI extends JFrame {
 		setTitle("M.A.P. Demo Interface");
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		setLocation(WINDOW_HLOC, WINDOW_VLOC);
+		setResizable(false);
 		sPanel = new SpectrogramPanel();
 		add(sPanel);
 		addWindowListener(new DemoWindowAdapter());
@@ -35,7 +36,7 @@ public class DemoUI extends JFrame {
 		
 		setVisible(true);
 		
-		new Thread(processChunk).start();
+		new Thread(audioProcessor).start();
 	}
 	
 	private class DemoWindowAdapter extends WindowAdapter {
@@ -44,7 +45,7 @@ public class DemoUI extends JFrame {
 		}
 	}
 	
-	private Runnable processChunk = new Runnable() {
+	private Runnable audioProcessor = new Runnable() {
 		public void run() {
 			while (true) {
 				short[] chunk = aHandler.getChunk(CHUNK_SIZE);
