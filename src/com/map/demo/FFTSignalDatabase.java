@@ -2,19 +2,21 @@ package com.map.demo;
 
 public class FFTSignalDatabase {
 	// How many hits in a row before detection
-	static final int DETECT_THRESHOLD = 7;
-	static final int MAX_COUNT = 12;
+	static final int DETECT_THRESHOLD = 6;
+	static final int MAX_COUNT = 10;
 
 	// Frequency range to search
-	static final int MIN_FREQ = 1200;
-	static final int MAX_FREQ = 2200;
+	static final int MIN_FREQ = 800;
+	static final int MAX_FREQ = 2600;
 
 	// Minimum amplitude to trigger a 'hit'
 	static final int MIN_AMP = 2000000;
 
 	// Maximum allowable change in frequency between two samples
 	// This is used to detect only relatively "smooth", continuous signals
-	static final int MAX_FREQ_DELTA = 400;
+	static final int MAX_FREQ_DELTA = 200;
+
+	static final int PDEVIATIONS = 4;
 
 	private int currentCount = 0;
 	private int curFreq;
@@ -33,7 +35,31 @@ public class FFTSignalDatabase {
 	public MAPFrame searchChunk(int vals[]) {
 		int maxVal = -1;
 		int maxLevel = -1;
+		long sum = 0;
+		long sos = 0;
+		double avg;
+		double stdev;
+		boolean[] hits = new boolean[vals.length];
 		MAPFrame frame;
+
+		for (int i = minIndex; i < maxIndex; i++) {
+			sum += Math.abs(vals[i]);
+		}
+
+		avg = sum / (maxIndex - minIndex);
+
+		for (int i = minIndex; i < maxIndex; i++) {
+			sos += Math.pow(Math.abs(vals[i]) - avg, 2);
+		}
+
+		stdev = Math.sqrt(sos / (maxIndex - minIndex));
+
+		for (int i = minIndex; i < maxIndex; i++) {
+			if (Math.abs(vals[i]) > MIN_AMP
+					&& Math.abs(vals[i]) > (avg + PDEVIATIONS * stdev)) {
+				hits[i] = true;
+			}
+		}
 
 		// Search for the loudest frequency in the detection range
 		for (int i = minIndex; i < maxIndex; i++) {
@@ -69,13 +95,13 @@ public class FFTSignalDatabase {
 
 		if (currentCount >= DETECT_THRESHOLD) {
 			// Enough hits detected in a row, signal detected
-			frame = new MAPFrame(vals, new boolean[vals.length], freqToIndex(curFreq));
+			frame = new MAPFrame(vals, hits, freqToIndex(curFreq));
 
 			if (currentCount > MAX_COUNT) {
 				currentCount = MAX_COUNT;
 			}
 		} else {
-			frame = new MAPFrame(vals, new boolean[vals.length], -1);
+			frame = new MAPFrame(vals, hits, -1);
 		}
 
 		return frame;

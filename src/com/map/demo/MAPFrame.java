@@ -42,6 +42,20 @@ public class MAPFrame {
 
 		percent *= 0.7;
 
-		return new Color((1 - percent), (1 - percent), (1 - percent)).getRGB();
+		boolean hit = false;
+
+		for (int i = offset; i < offset + count; i++) {
+			if (hits[i]) {
+				hit = true;
+				break;
+			}
+		}
+
+		if (hit) {
+			return new Color(0, (1 - percent), 0).getRGB();
+		} else {
+			return new Color((1 - percent), (1 - percent), (1 - percent))
+					.getRGB();
+		}
 	}
 }
