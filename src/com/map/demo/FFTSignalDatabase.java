@@ -15,6 +15,7 @@ public class FFTSignalDatabase {
 	// Maximum allowable change in frequency between two samples
 	// This is used to detect only relatively "smooth", continuous signals
 	static final int MAX_FREQ_DELTA = 200;
+	static final int RESET_FREQ_DELTA = 350;
 
 	static final int PDEVIATIONS = 4;
 
@@ -79,8 +80,11 @@ public class FFTSignalDatabase {
 				if (Math.abs(maxFreq - curFreq) < MAX_FREQ_DELTA) {
 					// Frequency is within expected range, accept
 					currentCount++;
+				} else if (Math.abs(maxFreq - curFreq) > RESET_FREQ_DELTA) {
+					// Frequency is way out of expected range, reset
+					currentCount = 0;
 				} else {
-					// Frequency is outside of expected range, reset
+					// Frequency is outside of expected range, decrement
 					currentCount--;
 				}
 			} else {
